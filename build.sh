@@ -1,6 +1,6 @@
 #!/bin/bash
 
-docker-compose pull
-docker-compose build
-docker-compose run web rake
+/usr/local/bin/docker-compose pull
+/usr/local/bin/docker-compose build
+/usr/local/bin/docker-compose run web rake
 
