@@ -1,28 +1,17 @@
-Emerald CI Environment
-======================
+Emerald CI Git
+==============
 
-Docker image containing the environment used to run a build job within Emerald
-CI.
+This is the Docker image that sets up the volume container for following parts
+of the build. It clones the git repo and does a checkout on the required
+commit.
 
-It can be used to reconstruct the build environment locally.
+Essentially what Emerald CI does througout the whole build process is
 
-For example, take the ruby example: https://github.com/emerald-ci/ruby-example
+	docker create -v /project -v /var/run/docker.sock:/var/run/docker.sock --name emeraldci_env_data alpine /bin/true
+	docker run --rm -it --volumes-from emeraldci_env_data --name emeraldci_git emeraldci/git https://github.com/emerald-ci/ruby-example
+	docker run --rm -it --volumes-from emeraldci_env_data --name emeraldci_test_runner emeraldci/test-runner
+	docker run --rm -it --volumes-from emeraldci_env_data --name emeraldci_plugin alpine /bin/sh
+	docker rm emeraldci_env_data
 
-To run the job exactly as it is done on the Emerald CI environment simply run:
-
-	docker run docker run --rm --privileged -v /var/run/docker.sock:/var/run/docker.sock -it emeraldci/environment https://github.com/emerald-ci/ruby-example c05c3b3ef562887153bcaa5aa93ff74f1c9f44e4
-
-> Hint: This is almost exactly how Emerald CI starts a job, except, that log
-> collection is added using docker's fluentd logging driver
-
-Development
------------
-
-To build this image with the latest released version of the Emerald Test Runner
-run
-
-	make
-
-To build the image with a local build of the test-runner use
-
-	make dev
+The only state left between containers are the files shared through the volume
+container.
